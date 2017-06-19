@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
+class RecordSoundsViewController: UIViewController {
 
     @IBOutlet weak var recordingLabel: UILabel!
     @IBOutlet weak var stopRecordingButton: UIButton!
@@ -55,15 +55,6 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
         stopRecordingButton.isEnabled = isRecording
     }
     
-    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
-    
-        if flag{
-            performSegue(withIdentifier: "stopRecording", sender: audioRecorder.url)
-        }else {
-            print("Recording was not successful.")
-        }
-    }
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "stopRecording" {
             let playSoundVC = segue.destination as! PlaySoundsViewController
@@ -73,3 +64,28 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
     }
 }
 
+extension RecordSoundsViewController: AVAudioRecorderDelegate {
+
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
+        
+        if flag{
+            performSegue(withIdentifier: "stopRecording", sender: audioRecorder.url)
+        }else {
+            displayError("Recording was not successful.")
+        }
+    }
+    
+    /// Display error message to the user by using UIAlertAction
+    ///
+    /// - Parameter message: Error message
+    private func displayError(_ message: String){
+        
+        let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        
+        let dismissAction = UIAlertAction(title: "Dismiss", style: .default, handler: { action in
+            alert.dismiss(animated: true, completion: nil)
+        })
+        alert.addAction(dismissAction)
+        present(alert, animated: true, completion: nil)
+    }
+}
